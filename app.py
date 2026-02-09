@@ -7,16 +7,21 @@ import os
 app = Flask(__name__)
 app.secret_key = 'btech_sarkari_final_2026'
 
-# --- Configuration for Database (PostgreSQL for Render / SQLite for Local) ---
+# --- Configuration for Database ---
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
 if DATABASE_URL:
     # Render fix: postgres:// ko postgresql:// mein badalna zaroori hai
     if DATABASE_URL.startswith("postgres://"):
         DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
-    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+    
+    # SSL Mode Fix: Render PostgreSQL ke liye ye line bahut zaroori hai
+    if "?" not in DATABASE_URL:
+        app.config['SQLALCHEMY_DATABASE_URI'] = f"{DATABASE_URL}?sslmode=require"
+    else:
+        app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 else:
-    # Local machine ke liye purana SQLite chalega
+    # Local machine ke liye SQLite
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -27,15 +32,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 db = SQLAlchemy(app)
-
-# --- Email Configuration ---
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'abhishekk95675@gmail.com'
-app.config['MAIL_PASSWORD'] = 'gonq jqjw pita acrl' 
-app.config['MAIL_DEFAULT_SENDER'] = 'abhishekk95675@gmail.com'
-mail = Mail(app)
 
 # --- Models ---
 class User(db.Model):
@@ -52,16 +48,33 @@ class Job(db.Model):
     last_date = db.Column(db.String(50), nullable=True)
     pdf_filename = db.Column(db.String(200), nullable=True)
 
+# --- Email Configuration ---
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'abhishekk95675@gmail.com'
+app.config['MAIL_PASSWORD'] = 'gonq jqjw pita acrl' 
+app.config['MAIL_DEFAULT_SENDER'] = 'abhishekk95675@gmail.com'
+mail = Mail(app)
+
 # --- DATABASE INITIALIZATION ---
+# Isse tables apne aap ban jayengi PostgreSQL mein
 with app.app_context():
-    db.create_all()
+    try:
+        db.create_all()
+        print("Database tables created successfully!")
+    except Exception as e:
+        print(f"Error creating database: {e}")
 
 # --- Routes ---
 
 @app.route('/')
 def home():
     user = session.get('username')
-    all_jobs = Job.query.all()
+    try:
+        all_jobs = Job.query.all()
+    except:
+        all_jobs = []
     return render_template('index.html', jobs=all_jobs, user=user)
 
 @app.route('/apply/<int:job_id>')
