@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Dashboard - BTech Sarkari</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f3; padding: 40px; }
+        .dash-card { max-width: 600px; margin: auto; background: white; border-radius: 15px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .header { background: #2c3e50; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
+        .app-item { border-left: 4px solid #3498db; background: #f9f9f9; margin-bottom: 10px; padding: 15px; border-radius: 0 8px 8px 0; display: flex; justify-content: space-between; align-items: center; }
+        .empty { text-align: center; color: #888; padding: 20px; }
+        .back-btn { display: inline-block; margin-top: 20px; color: #3498db; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="dash-card">
+        <div class="header">
+            <h3>Welcome, {{ user }}!</h3>
+            <p>Your Applied Jobs History</p>
+        </div>
+
+        {% if apps %}
+            {% for app in apps %}
+            <div class="app-item">
+                <div>
+                    <strong>{{ app.job_title }}</strong><br>
+                    <small style="color: #888;">Status: Redirected to Official Site</small>
+                </div>
+                <span style="color: #27ae60;"><i class="fas fa-check-circle"></i></span>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty">
+                <p>You didn't apply for any job role now.</p>
+            </div>
+        {% endif %}
+
+        <a href="/" class="back-btn">← Browse More Jobs</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTech Sarkari Pariksha | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #003366;
+            --secondary: #00509d;
+            --accent: #ffca28;
+            --success: #28a745;
+            --danger: #e74c3c;
+            --text-dark: #2c3e50;
+            --bg-light: #f8f9fa;
+            --info: #17a2b8; /* PDF button ke liye naya color */
+        }
+
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            margin: 0; padding: 0; 
+            background-color: var(--bg-light); 
+            color: var(--text-dark); 
+        }
+
+        header { 
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; 
+            padding: 60px 20px; 
+            text-align: center; 
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .user-nav { 
+            position: absolute; top: 15px; right: 25px; 
+            font-size: 0.85rem; background: rgba(255,255,255,0.1);
+            padding: 8px 15px; border-radius: 30px;
+            backdrop-filter: blur(5px);
+        }
+
+        .user-nav a { color: var(--accent); text-decoration: none; font-weight: 600; margin-left: 10px; }
+        .logout-btn { color: #ff6b6b !important; }
+
+        header h1 { font-size: 2.5rem; margin: 0; letter-spacing: 1px; }
+        header p { opacity: 0.9; font-weight: 300; }
+
+        .container { padding: 40px 20px; max-width: 900px; margin: auto; }
+        
+        h2.section-title { 
+            text-align: center; color: var(--primary); 
+            margin-bottom: 30px; font-weight: 700;
+            position: relative;
+        }
+
+        h2.section-title::after {
+            content: ''; display: block; width: 50px; height: 4px;
+            background: var(--accent); margin: 10px auto; border-radius: 2px;
+        }
+
+        .job-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        
+        .job-card { 
+            background: white; padding: 25px; border-radius: 15px; 
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #eee; position: relative; overflow: hidden;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+
+        .job-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 6px; height: 100%;
+            background: var(--success);
+        }
+
+        .job-card:hover { 
+            transform: translateY(-10px); 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+        }
+
+        .job-card h3 { margin: 0 0 10px 0; color: var(--primary); font-size: 1.3rem; }
+        .job-card p { margin: 5px 0; font-size: 0.95rem; color: #555; }
+
+        .last-date {
+            color: var(--danger);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .salary-tag { 
+            display: inline-block; background: #e8f5e9; color: var(--success);
+            padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; 
+            font-weight: 600; margin-top: 10px; align-self: flex-start;
+        }
+
+        .btn { 
+            background: var(--primary); color: white; padding: 12px 25px; 
+            text-decoration: none; border-radius: 8px; display: block; 
+            text-align: center; margin-top: 15px; font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn:hover { background: var(--secondary); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+
+        /* PDF Button Style */
+        .btn-pdf {
+            background: white; color: var(--info); border: 2px solid var(--info);
+            padding: 10px 20px; text-decoration: none; border-radius: 8px;
+            display: block; text-align: center; margin-top: 15px; font-weight: 600;
+            font-size: 0.85rem; transition: 0.3s;
+        }
+
+        .btn-pdf:hover { background: var(--info); color: white; }
+
+        .dev-card {
+            background: linear-gradient(135deg, #ffffff, #f1f7ff); 
+            padding: 40px; border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+            text-align: center; border: 1px solid #e0e0e0;
+            margin-top: 50px;
+        }
+
+        .dev-avatar {
+            width: 100px; height: 100px; 
+            border-radius: 50%; 
+            display: block; 
+            margin: 0 auto 15px; 
+            object-fit: cover; 
+            box-shadow: 0 4px 10px rgba(0,51,102,0.3);
+            border: 3px solid white;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .dev-avatar:hover { transform: scale(1.15); }
+
+        footer { background: #1a1a1a; color: #bbb; padding: 50px 20px; text-align: center; margin-top: 60px; }
+        .footer-links { margin-bottom: 20px; }
+        .footer-links a { color: white; text-decoration: none; margin: 0 15px; font-size: 0.9rem; transition: color 0.3s; }
+        .footer-links a:hover { color: var(--accent); }
+        .disclaimer-text { font-size: 0.75rem; max-width: 600px; margin: 20px auto; line-height: 1.6; color: #777; }
+        
+        .admin-secret-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: #333;
+            text-decoration: none;
+            font-size: 0.65rem;
+            border: 1px solid #333;
+            padding: 3px 10px;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+        .admin-secret-link:hover { color: #888; border-color: #888; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="user-nav">
+        {% if user %}
+            <span>Welcome <b>{{ user }}</b>!</span>
+            <a href="/logout" class="logout-btn">Logout</a>
+        {% else %}
+            <a href="/login">Login</a> | <a href="/signup">Signup</a>
+        {% endif %}
+    </div>
+    <h1> B.Tech <span style="color: var(--accent); "> Sarkari Pariksha</span> 🎓</h1>
+    <p>Premium Career Portal for Engineers</p>
+</header>
+
+<div class="container">
+    <h2 class="section-title">Latest Job Opportunities</h2>
+    
+    <div class="job-grid">
+        {% for job in jobs %}
+        <div class="job-card">
+            <div>
+                <h3>{{ job.title }}</h3>
+                <p><strong>Branch:</strong> {{ job.branch }}</p>
+                
+                <span class="last-date">📅 Last Date: {{ job.last_date if job.last_date else 'N/A' }}</span>
+                
+                <div class="salary-tag">₹ {{ job.salary }}</div>
+            </div>
+
+            {% if job.pdf_filename %}
+            <a href="{{ url_for('static', filename='uploads/pdfs/' + job.pdf_filename) }}" target="_blank" class="btn-pdf">
+                📄 View Notification
+            </a>
+            {% endif %}
+
+            <a href="{{ url_for('apply', job_id=job.id) }}" class="btn">Apply Now</a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="dev-card">
+        <img src="{{ url_for('static', filename='My Profile.png') }}" class="dev-avatar" alt="Abhishek">
+        <h3 style="margin: 0; color: var(--primary); font-size: 1.5rem;">Abhishek Kumar-Software Engineer</h3>
+        <p style="margin: 5px 0; color: var(--success); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">
+            Lead Developer & Visionary
+        </p>
+        <p style="max-width: 500px; margin: 15px auto; color: #555; line-height: 1.6; font-style: italic;">
+            "Maine ye platform isliye banaya hai taaki har Engineering student ko sahi samay par sarkari naukri ki update mil sake."
+        </p>
+        <div style="margin-top: 20px;">
+            <a href="/contact" style="text-decoration: none; color: var(--primary); font-weight: 600; border: 2px solid var(--primary); padding: 8px 25px; border-radius: 25px; transition: 0.3s; display: inline-block;">
+                Let's Connect
+            </a>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-links">
+        <a href="/">Home</a> 
+        <a href="/contact">Contact Us</a> 
+        <a href="#">Privacy Policy</a> 
+        <a href="#">Terms</a>
+    </div>
+    <div class="disclaimer-text">
+        <strong>Disclaimer:</strong> BTech Sarkari Pariksha is an independent educational portal. We are not affiliated with any government organization.
+    </div>
+    <p style="font-size: 0.9rem; color: #fff; margin-top: 20px;">
+        Designed & Developed by <b>Abhishek kumar </b>
+    </p>
+    <p style="font-size: 0.7rem; color: #555;">&copy; 2026 Abhishek Kumar </p>
+    
+    <a href="/admin" class="admin-secret-link">Admin Access</a>
+</footer>
+
+</body>
+</html>

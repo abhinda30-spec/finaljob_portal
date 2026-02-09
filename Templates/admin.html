@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin - BTech Sarkari Pariksha</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; padding: 40px; background: #f0f2f5; color: #333; }
+        .container { 
+            background: white; padding: 30px; border-radius: 12px; 
+            max-width: 800px; margin: auto; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+        }
+        h2 { color: #003366; text-align: center; margin-bottom: 25px; }
+        
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; }
+        
+        input { 
+            width: 100%; padding: 12px; margin-bottom: 10px; 
+            border: 1px solid #ddd; border-radius: 6px; 
+            box-sizing: border-box; font-family: inherit;
+        }
+        
+        button { 
+            background: #28a745; color: white; border: none; 
+            padding: 15px; width: 100%; cursor: pointer; 
+            border-radius: 6px; font-size: 1rem; font-weight: 600;
+            transition: 0.3s;
+        }
+        button:hover { background: #218838; }
+
+        .job-list { margin-top: 40px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
+        th, td { 
+            border: 1px solid #eee; padding: 12px; text-align: left; font-size: 0.9rem; 
+        }
+        th { background: #003366; color: white; }
+        
+        .del-btn { 
+            color: #ff4d4d; text-decoration: none; font-weight: bold; 
+            padding: 5px 10px; border: 1px solid #ff4d4d; border-radius: 4px;
+        }
+        .del-btn:hover { background: #ff4d4d; color: white; }
+        
+        .back-link { 
+            display: inline-block; margin-top: 20px; color: #003366; 
+            text-decoration: none; font-weight: 600; 
+        }
+
+        /* Naya Style PDF input ke liye */
+        .file-input {
+            border: 1px dashed #003366;
+            padding: 10px;
+            background: #f9f9f9;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>🚀 Add New Job Opening</h2>
+        
+        <form method="POST" enctype="multipart/form-data">
+            <label>Job Title</label>
+            <input type="text" name="title" placeholder="e.g. BHEL Executive Trainee" required>
+            
+            <label>Eligible Branches</label>
+            <input type="text" name="branch" placeholder="e.g. ME, EE, Civil" required>
+            
+            <label>Salary Package</label>
+            <input type="text" name="salary" placeholder="e.g. Rs. 70,000/-" required>
+            
+            <label>Apply Link (URL)</label>
+            <input type="text" name="url" placeholder="https://official-link.com" required>
+            
+            <label>Last Date to Apply</label>
+            <input type="text" name="last_date" placeholder="e.g. 25 Feb 2026" required>
+
+            <label>Upload Official Notification (PDF)</label>
+            <input type="file" name="pdf_file" accept=".pdf" class="file-input">
+            
+            <button type="submit">Publish Job Live</button>
+        </form>
+
+        <div class="job-list">
+            <h3>Current Active Jobs</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Job Title</th>
+                        <th>Last Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job in jobs %}
+                    <tr>
+                        <td>{{ job.title }}</td>
+                        <td style="color: #d9534f; font-weight: 600;">{{ job.last_date }}</td>
+                        <td>
+                            <a href="{{ url_for('delete_job', id=job.id) }}" class="del-btn" onclick="return confirm('Kya aap sach mein isse delete karna chahte hain?')">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #eee; margin-top: 30px;">
+        
+        <a href="/" class="back-link">← View Live Website</a>
+        <span style="margin: 0 10px; color: #ccc;">|</span>
+        <a href="{{ url_for('logout') }}" style="color: #888; text-decoration: none; font-size: 0.9rem;">Logout Admin</a>
+    </div>
+
+</body>
+</html>
