@@ -48,17 +48,17 @@ class Job(db.Model):
     last_date = db.Column(db.String(50), nullable=True)
     pdf_filename = db.Column(db.String(200), nullable=True)
 
-# --- Email Configuration ---
+# --- Updated Email Configuration (Render Friendly) ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'abhishekk95675@gmail.com'
-app.config['MAIL_PASSWORD'] = 'gonq jqjw pita acrl' 
-app.config['MAIL_DEFAULT_SENDER'] = 'abhishekk95675@gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USERNAME'] = 'abhinda30@gmail.com'
+app.config['MAIL_PASSWORD'] = 'mvja piwt sbje tjrm' 
+app.config['MAIL_DEFAULT_SENDER'] = 'abhinda30@gmail.com'
 mail = Mail(app)
 
 # --- DATABASE INITIALIZATION ---
-# Isse tables apne aap ban jayengi PostgreSQL mein
 with app.app_context():
     try:
         db.create_all()
@@ -95,12 +95,18 @@ def contact():
         email = request.form.get('email')
         message = request.form.get('message')
         try:
-            msg = Message(subject=f"New Inquiry: {name}",
-                          recipients=['abhishekk95675@gmail.com'],
-                          body=f"Name: {name}\nEmail: {email}\n\nMessage:\n{message}")
+            # Added sender and improved message handling
+            msg = Message(
+                subject=f"New Inquiry: {name}",
+                sender=app.config['MAIL_USERNAME'],
+                recipients=['abhinda30@gmail.com'],
+                body=f"Name: {name}\nEmail: {email}\n\nMessage:\n{message}"
+            )
             mail.send(msg)
             return "<h3>Aapka message mil gaya hai! Hum jald hi sampark karenge. <a href='/'>Back Home</a></h3>"
         except Exception as e:
+            # Print error for Render logs
+            print(f"DEBUG: Email sending failed: {e}")
             return f"<h3>Email Error: {str(e)}</h3>"
     return render_template('contact.html', user=user)
 
