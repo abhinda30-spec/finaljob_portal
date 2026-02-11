@@ -11,20 +11,23 @@ app.secret_key = 'btech_sarkari_final_2026'
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
 if DATABASE_URL:
-    # Render fix: postgres:// ko postgresql:// mein badalna zaroori hai
     if DATABASE_URL.startswith("postgres://"):
         DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
     
-    # SSL Mode Fix: Render PostgreSQL ke liye ye line bahut zaroori hai
     if "?" not in DATABASE_URL:
         app.config['SQLALCHEMY_DATABASE_URI'] = f"{DATABASE_URL}?sslmode=require"
     else:
         app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 else:
-    # Local machine ke liye SQLite
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 
+# --- Memory & Optimization Fixes ---
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Isse Neon database ke connections memory nahi bharenge
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    "pool_pre_ping": True,
+    "pool_recycle": 300,
+}
 
 # PDF Upload Folder Setup
 UPLOAD_FOLDER = 'static/uploads/pdfs'
@@ -48,7 +51,7 @@ class Job(db.Model):
     last_date = db.Column(db.String(50), nullable=True)
     pdf_filename = db.Column(db.String(200), nullable=True)
 
-# --- Updated Email Configuration (Render Friendly) ---
+# --- Email Configuration (SSL Mode for Render) ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_TLS'] = False
@@ -75,6 +78,7 @@ def home():
         all_jobs = Job.query.all()
     except:
         all_jobs = []
+    # Home page par Loading Spinner ya message dikhana yaad rakhein jaisa aapne plan kiya tha
     return render_template('index.html', jobs=all_jobs, user=user)
 
 @app.route('/apply/<int:job_id>')
@@ -95,7 +99,6 @@ def contact():
         email = request.form.get('email')
         message = request.form.get('message')
         try:
-            # Added sender and improved message handling
             msg = Message(
                 subject=f"New Inquiry: {name}",
                 sender=app.config['MAIL_USERNAME'],
@@ -105,8 +108,7 @@ def contact():
             mail.send(msg)
             return "<h3>Aapka message mil gaya hai! Hum jald hi sampark karenge. <a href='/'>Back Home</a></h3>"
         except Exception as e:
-            # Print error for Render logs
-            print(f"DEBUG: Email sending failed: {e}")
+            print(f"MAIL ERROR: {e}")
             return f"<h3>Email Error: {str(e)}</h3>"
     return render_template('contact.html', user=user)
 
@@ -210,5 +212,6 @@ def logout():
     return redirect(url_for('home'))
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 8080))
+    # Render default port fix
+    port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
