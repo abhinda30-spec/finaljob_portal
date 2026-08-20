@@ -63,6 +63,54 @@
             background: var(--accent); margin: 10px auto; border-radius: 2px;
         }
 
+        /* Guidance Card Styling */
+        .guidance-card {
+            background: linear-gradient(135deg, #002244, #00509d);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 25px rgba(0, 51, 102, 0.25);
+            border: 2px solid var(--accent);
+        }
+
+        .guidance-form-box {
+            background: #ffffff;
+            color: #333;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .guidance-form-box input, 
+        .guidance-form-box textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
+        .qr-section {
+            text-align: center;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px dashed var(--secondary);
+            margin: 15px 0;
+        }
+
+        .qr-section img {
+            width: 160px;
+            height: 160px;
+            border-radius: 8px;
+            border: 2px solid #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
         /* Feature Banners Styling */
         .feature-banner {
             color: white;
@@ -77,10 +125,6 @@
             gap: 20px;
         }
 
-        .guidance-banner {
-            background: linear-gradient(135deg, #11998e, #38ef7d);
-        }
-
         .research-banner {
             background: linear-gradient(135deg, #1e3c72, var(--purple));
             box-shadow: 0 8px 20px rgba(111, 66, 193, 0.2);
@@ -89,15 +133,6 @@
         .banner-text h3 {
             margin: 0 0 10px 0;
             font-size: 1.6rem;
-            color: #fff;
-        }
-
-        .guidance-banner .banner-text h3 span {
-            color: #fff;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-        }
-
-        .research-banner .banner-text h3 {
             color: var(--accent);
         }
 
@@ -110,7 +145,7 @@
         }
 
         .btn-banner {
-            background: #fff;
+            background: var(--accent);
             color: var(--primary);
             padding: 12px 25px;
             text-decoration: none;
@@ -122,25 +157,9 @@
         }
 
         .btn-banner:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-        }
-
-        .btn-guidance {
-            color: #0b6623;
-        }
-        .btn-guidance:hover {
-            background: var(--primary);
-            color: #fff;
-        }
-
-        .btn-research {
-            background: var(--accent);
-            color: var(--primary);
-        }
-        .btn-research:hover {
             background: #fff;
             color: var(--purple);
+            transform: translateY(-2px);
         }
 
         .job-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
@@ -243,7 +262,7 @@
 
 <header>
     <div class="user-nav">
-        <a href="{{ url_for('guidance') }}">1-on-1 Guidance</a> | 
+        <a href="#guidance-section">1-on-1 Guidance</a> | 
         {% if user %}
             <span>Welcome <b>{{ user }}</b>!</span>
             <a href="/logout" class="logout-btn">Logout</a>
@@ -257,13 +276,47 @@
 
 <div class="container">
 
-    <!-- 1st-Year Galgotias Guidance Banner -->
-    <div class="feature-banner guidance-banner">
-        <div class="banner-text">
-            <h3>🎓 1st Year Student Guidance Portal</h3>
-            <p>Exclusive 1-on-1 career, syllabus, and roadmap guidance for 1st-year students of <strong>all branches at Galgotias University</strong>. Get direct mentorship and queries resolved fast!</p>
+    <!-- Integrated 1st-Year Guidance & Payment Form -->
+    <div class="guidance-card" id="guidance-section">
+        <h3 style="margin: 0 0 10px 0; font-size: 1.8rem; color: var(--accent);">
+            🎓 1st Year Guidance Session (Galgotias University)
+        </h3>
+        <p style="margin: 0; line-height: 1.6; opacity: 0.95;">
+            Get personal 1-on-1 mentorship for course roadmap, branch selection, subject prep, and exam strategies. Fill out your details below to register for a 30-minute consultation session (₹100).
+        </p>
+
+        <div class="guidance-form-box">
+            <h4 style="margin-top: 0; color: var(--primary); text-align: center; font-size: 1.2rem;">
+                Student Registration & Payment
+            </h4>
+
+            <form action="{{ url_for('guidance') }}" method="POST">
+                <input type="text" name="full_name" placeholder="Full Name (e.g., Rahul Sharma)" required>
+                <input type="text" name="contact_no" placeholder="WhatsApp / Phone Number" required>
+                <textarea name="query_text" placeholder="Describe your topic, question, or guidance required..." rows="3" required></textarea>
+
+                <div class="qr-section">
+                    <p style="margin: 0 0 10px 0; font-weight: 600; color: var(--primary);">
+                        Scan QR Code to pay ₹100 via UPI
+                    </p>
+                    <img src="{{ url_for('static', filename='qr.jpeg') }}" alt="Payment QR Code">
+                    <p style="margin: 8px 0 0 0; font-size: 0.85rem; color: #555;">
+                        Accepted: Paytm, PhonePe, GPay, BHIM
+                    </p>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 10px; margin: 15px 0;">
+                    <input type="checkbox" name="payment_done" value="1" id="payCheck" required style="width: auto; margin: 0;">
+                    <label for="payCheck" style="font-size: 0.85rem; font-weight: 600;">
+                        I have completed the ₹100 payment via QR Code
+                    </label>
+                </div>
+
+                <button type="submit" class="btn" style="width: 100%; background: var(--success); border: none; font-size: 1rem; cursor: pointer;">
+                    Submit Guidance Request
+                </button>
+            </form>
         </div>
-        <a href="{{ url_for('guidance') }}" class="btn-banner btn-guidance">Book Guidance Session (₹100) &rarr;</a>
     </div>
 
     <!-- Research Paper Section Banner -->
@@ -272,7 +325,7 @@
             <h3>🔬 Galgotias University Research Portal</h3>
             <p>Designed for 4th-year final students to upload research paper drafts, receive advisor feedback, and follow IEEE publishing guidelines.</p>
         </div>
-        <a href="{{ url_for('research') }}" class="btn-banner btn-research">Prepare Research Paper &rarr;</a>
+        <a href="{{ url_for('research') }}" class="btn-banner">Prepare Research Paper &rarr;</a>
     </div>
 
     <h2 class="section-title">Latest Job Opportunities</h2>
@@ -320,7 +373,7 @@
 <footer>
     <div class="footer-links">
         <a href="/">Home</a> 
-        <a href="{{ url_for('guidance') }}">1st-Year Guidance</a>
+        <a href="#guidance-section">1st-Year Guidance</a>
         <a href="{{ url_for('research') }}">Research Portal</a>
         <a href="/contact">Contact Us</a> 
         <a href="#">Privacy Policy</a> 
