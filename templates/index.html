@@ -39,9 +39,12 @@
             font-size: 0.85rem; background: rgba(255,255,255,0.1);
             padding: 8px 15px; border-radius: 30px;
             backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .user-nav a { color: var(--accent); text-decoration: none; font-weight: 600; margin-left: 10px; }
+        .user-nav a { color: var(--accent); text-decoration: none; font-weight: 600; }
         .logout-btn { color: #ff6b6b !important; }
 
         header h1 { font-size: 2.5rem; margin: 0; letter-spacing: 1px; }
@@ -60,14 +63,13 @@
             background: var(--accent); margin: 10px auto; border-radius: 2px;
         }
 
-        /* Research Section Banner Styling */
-        .research-banner {
-            background: linear-gradient(135deg, #1e3c72, var(--purple));
+        /* Feature Banners Styling */
+        .feature-banner {
             color: white;
             padding: 30px;
             border-radius: 15px;
-            margin-bottom: 50px;
-            box-shadow: 0 8px 20px rgba(111, 66, 193, 0.2);
+            margin-bottom: 30px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -75,22 +77,40 @@
             gap: 20px;
         }
 
-        .research-banner-text h3 {
+        .guidance-banner {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+        }
+
+        .research-banner {
+            background: linear-gradient(135deg, #1e3c72, var(--purple));
+            box-shadow: 0 8px 20px rgba(111, 66, 193, 0.2);
+        }
+
+        .banner-text h3 {
             margin: 0 0 10px 0;
             font-size: 1.6rem;
+            color: #fff;
+        }
+
+        .guidance-banner .banner-text h3 span {
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .research-banner .banner-text h3 {
             color: var(--accent);
         }
 
-        .research-banner-text p {
+        .banner-text p {
             margin: 0;
             font-size: 0.95rem;
-            opacity: 0.9;
+            opacity: 0.95;
             max-width: 550px;
             line-height: 1.5;
         }
 
-        .btn-research {
-            background: var(--accent);
+        .btn-banner {
+            background: #fff;
             color: var(--primary);
             padding: 12px 25px;
             text-decoration: none;
@@ -101,10 +121,26 @@
             white-space: nowrap;
         }
 
+        .btn-banner:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-guidance {
+            color: #0b6623;
+        }
+        .btn-guidance:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-research {
+            background: var(--accent);
+            color: var(--primary);
+        }
         .btn-research:hover {
             background: #fff;
             color: var(--purple);
-            transform: translateY(-2px);
         }
 
         .job-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
@@ -207,6 +243,7 @@
 
 <header>
     <div class="user-nav">
+        <a href="{{ url_for('guidance') }}">1-on-1 Guidance</a> | 
         {% if user %}
             <span>Welcome <b>{{ user }}</b>!</span>
             <a href="/logout" class="logout-btn">Logout</a>
@@ -220,13 +257,22 @@
 
 <div class="container">
 
+    <!-- 1st-Year Galgotias Guidance Banner -->
+    <div class="feature-banner guidance-banner">
+        <div class="banner-text">
+            <h3>🎓 1st Year Student Guidance Portal</h3>
+            <p>Exclusive 1-on-1 career, syllabus, and roadmap guidance for 1st-year students of <strong>all branches at Galgotias University</strong>. Get direct mentorship and queries resolved fast!</p>
+        </div>
+        <a href="{{ url_for('guidance') }}" class="btn-banner btn-guidance">Book Guidance Session (₹100) &rarr;</a>
+    </div>
+
     <!-- Research Paper Section Banner -->
-    <div class="research-banner">
-        <div class="research-banner-text">
+    <div class="feature-banner research-banner">
+        <div class="banner-text">
             <h3>🔬 Galgotias University Research Portal</h3>
             <p>Designed for 4th-year final students to upload research paper drafts, receive advisor feedback, and follow IEEE publishing guidelines.</p>
         </div>
-        <a href="{{ url_for('research') }}" class="btn-research">Prepare Research Paper &rarr;</a>
+        <a href="{{ url_for('research') }}" class="btn-banner btn-research">Prepare Research Paper &rarr;</a>
     </div>
 
     <h2 class="section-title">Latest Job Opportunities</h2>
@@ -261,7 +307,7 @@
             Lead Developer & Visionary
         </p>
         <p style="max-width: 500px; margin: 15px auto; color: #555; line-height: 1.6; font-style: italic;">
-            "Maine ye platform isliye banaya hai taaki har Engineering student ko sahi samay par sarkari naukri ki update aur research paper prep guidelines mil sake."
+            "Maine ye platform isliye banaya hai taaki har Engineering student ko sahi samay par sarkari naukri ki update, 1st-year roadmap guidance, aur research paper prep guidelines mil sake."
         </p>
         <div style="margin-top: 20px;">
             <a href="/contact" style="text-decoration: none; color: var(--primary); font-weight: 600; border: 2px solid var(--primary); padding: 8px 25px; border-radius: 25px; transition: 0.3s; display: inline-block;">
@@ -274,6 +320,7 @@
 <footer>
     <div class="footer-links">
         <a href="/">Home</a> 
+        <a href="{{ url_for('guidance') }}">1st-Year Guidance</a>
         <a href="{{ url_for('research') }}">Research Portal</a>
         <a href="/contact">Contact Us</a> 
         <a href="#">Privacy Policy</a> 
