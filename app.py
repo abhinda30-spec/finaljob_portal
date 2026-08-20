@@ -50,7 +50,7 @@ class Job(db.Model):
     last_date = db.Column(db.String(50), nullable=True)
     pdf_filename = db.Column(db.String(200), nullable=True)
 
-# UPDATED MODEL: Research Papers for 4th Year Students (Added student_name & contact_no)
+# UPDATED MODEL: Research Papers for 4th Year Students
 class ResearchPaper(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_username = db.Column(db.String(50), nullable=False)
@@ -124,7 +124,6 @@ def contact():
             return f"<h3>Email Error: {str(e)}</h3>"
     return render_template('contact.html', user=user)
 
-# UPDATED ROUTE: Optional PDF, Red Asterisks, Student Name & Phone
 @app.route('/research', methods=['GET', 'POST'])
 def research():
     if 'username' not in session:
@@ -170,7 +169,8 @@ def research():
 def admin():
     if not session.get('admin_logged_in'):
         if request.method == 'POST':
-            if request.form.get('admin_password') == 'admin123':
+            # Updated password check
+            if request.form.get('admin_password') == 'Research!321#papers':
                 session['admin_logged_in'] = True
                 return redirect(url_for('admin'))
             else:
@@ -212,7 +212,7 @@ def admin():
     all_papers = ResearchPaper.query.all()
     return render_template('admin.html', jobs=all_jobs, papers=all_papers)
 
-@app.route('/review-paper/<int:paper_id>', methods=['POST'])
+@app.route('/review_paper/<int:paper_id>', methods=['POST'])
 def review_paper(paper_id):
     if not session.get('admin_logged_in'):
         return redirect(url_for('admin'))
