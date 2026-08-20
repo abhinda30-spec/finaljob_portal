@@ -32,27 +32,37 @@
             <form method="POST" enctype="multipart/form-data">
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Paper Title</label>
+                        <label class="form-label">Student Full Name <span class="text-danger">*</span></label>
+                        <input type="text" name="student_name" class="form-control" required placeholder="e.g., Rahul Sharma">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Contact Number <span class="text-danger">*</span></label>
+                        <input type="tel" name="contact_no" class="form-control" required placeholder="e.g., +91 9876543210">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Paper Title <span class="text-danger">*</span></label>
                         <input type="text" name="title" class="form-control" required placeholder="e.g., IoT Based Smart Farming">
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Branch / Specialization</label>
+                        <label class="form-label">Branch / Specialization <span class="text-danger">*</span></label>
                         <input type="text" name="branch" class="form-control" required placeholder="e.g., CSE - AI & ML">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Faculty Guide / Supervisor Name</label>
-                        <input type="text" name="supervisor" class="form-control" placeholder="e.g., Prof. Rajesh Sharma">
+                        <label class="form-label">Faculty Guide / Supervisor Name <span class="text-danger">*</span></label>
+                        <input type="text" name="guide_name" class="form-control" required placeholder="e.g., Dr. Rajesh Sharma">
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Upload Research Draft (PDF)</label>
-                        <input type="file" name="pdf_file" class="form-control" accept=".pdf" required>
+                        <label class="form-label">Upload Research Draft (PDF) <small class="text-muted">(Optional)</small></label>
+                        <input type="file" name="pdf_file" class="form-control" accept=".pdf">
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Abstract / Summary</label>
-                    <textarea name="abstract" class="form-control" rows="3" placeholder="Brief explanation of your project research..."></textarea>
+                    <label class="form-label">Abstract / Summary <span class="text-danger">*</span></label>
+                    <textarea name="abstract" class="form-control" rows="3" required placeholder="Brief explanation of your project research..."></textarea>
                 </div>
                 <button type="submit" class="btn btn-success">Submit Draft</button>
             </form>
@@ -65,20 +75,24 @@
         <table class="table table-striped table-bordered bg-white">
             <thead class="table-dark">
                 <tr>
+                    <th>Student Name</th>
+                    <th>Contact No</th>
                     <th>Title</th>
                     <th>Branch</th>
                     <th>Supervisor</th>
                     <th>Status</th>
                     <th>Guide Feedback</th>
-                    <th>Download PDF</th>
+                    <th>PDF File</th>
                 </tr>
             </thead>
             <tbody>
                 {% for paper in papers %}
                 <tr>
+                    <td><strong>{{ paper.student_name }}</strong></td>
+                    <td>{{ paper.contact_no }}</td>
                     <td>{{ paper.title }}</td>
                     <td>{{ paper.branch }}</td>
-                    <td>{{ paper.supervisor or 'N/A' }}</td>
+                    <td>{{ paper.guide_name or 'N/A' }}</td>
                     <td>
                         <span class="badge {% if paper.status == 'Approved' %}bg-success{% elif paper.status == 'Needs Revision' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
                             {{ paper.status }}
@@ -88,12 +102,14 @@
                     <td>
                         {% if paper.pdf_filename %}
                         <a href="{{ url_for('static', filename='uploads/pdfs/' + paper.pdf_filename) }}" target="_blank" class="btn btn-sm btn-outline-primary">View File</a>
+                        {% else %}
+                        <span class="text-muted small">No File</span>
                         {% endif %}
                     </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="6" class="text-center text-muted">No research papers uploaded yet.</td>
+                    <td colspan="8" class="text-center text-muted">No research papers uploaded yet.</td>
                 </tr>
                 {% endfor %}
             </tbody>

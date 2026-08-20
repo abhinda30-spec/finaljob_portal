@@ -50,17 +50,19 @@ class Job(db.Model):
     last_date = db.Column(db.String(50), nullable=True)
     pdf_filename = db.Column(db.String(200), nullable=True)
 
-# NEW MODEL: Research Papers for 4th Year Students
+# UPDATED MODEL: Research Papers for 4th Year Students (Added student_name & contact_no)
 class ResearchPaper(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_username = db.Column(db.String(50), nullable=False)
+    student_name = db.Column(db.String(100), nullable=False)
+    contact_no = db.Column(db.String(15), nullable=False)
     title = db.Column(db.String(200), nullable=False)
     branch = db.Column(db.String(100), nullable=False)
     guide_name = db.Column(db.String(100), nullable=True)
     abstract = db.Column(db.Text, nullable=True)
     status = db.Column(db.String(50), default="Under Review")  # Under Review, Approved, Revision Needed
     feedback = db.Column(db.Text, nullable=True)
-    pdf_filename = db.Column(db.String(200), nullable=True)
+    pdf_filename = db.Column(db.String(200), nullable=True)  # Optional PDF
 
 # --- Email Configuration (SSL Mode for Render) ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -122,7 +124,7 @@ def contact():
             return f"<h3>Email Error: {str(e)}</h3>"
     return render_template('contact.html', user=user)
 
-# NEW ROUTE: Student Research Paper Dashboard & Upload
+# UPDATED ROUTE: Optional PDF, Red Asterisks, Student Name & Phone
 @app.route('/research', methods=['GET', 'POST'])
 def research():
     if 'username' not in session:
@@ -132,6 +134,8 @@ def research():
     user = session.get('username')
     
     if request.method == 'POST':
+        student_name = request.form.get('student_name')
+        contact_no = request.form.get('contact_no')
         title = request.form.get('title')
         branch = request.form.get('branch')
         guide_name = request.form.get('guide_name')
@@ -139,12 +143,15 @@ def research():
         
         pdf_file = request.files.get('pdf_file')
         filename = None
+        # PDF upload is completely optional now
         if pdf_file and pdf_file.filename != '':
             filename = f"research_{user}_{secure_filename(pdf_file.filename)}"
             pdf_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         
         new_paper = ResearchPaper(
             student_username=user,
+            student_name=student_name,
+            contact_no=contact_no,
             title=title,
             branch=branch,
             guide_name=guide_name,
@@ -205,7 +212,6 @@ def admin():
     all_papers = ResearchPaper.query.all()
     return render_template('admin.html', jobs=all_jobs, papers=all_papers)
 
-# NEW ROUTE: Admin/Faculty updates research paper review status & feedback
 @app.route('/review-paper/<int:paper_id>', methods=['POST'])
 def review_paper(paper_id):
     if not session.get('admin_logged_in'):

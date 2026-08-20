@@ -7,60 +7,78 @@
         body { font-family: 'Poppins', sans-serif; padding: 40px; background: #f0f2f5; color: #333; }
         .container { 
             background: white; padding: 30px; border-radius: 12px; 
-            max-width: 800px; margin: auto; 
+            max-width: 1000px; margin: auto; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
         }
-        h2 { color: #003366; text-align: center; margin-bottom: 25px; }
+        h2, h3 { color: #003366; }
+        h2 { text-align: center; margin-bottom: 25px; }
         
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; }
         
-        input { 
-            width: 100%; padding: 12px; margin-bottom: 10px; 
+        input, select, textarea { 
+            width: 100%; padding: 10px; margin-bottom: 10px; 
             border: 1px solid #ddd; border-radius: 6px; 
             box-sizing: border-box; font-family: inherit;
         }
         
         button { 
             background: #28a745; color: white; border: none; 
-            padding: 15px; width: 100%; cursor: pointer; 
+            padding: 12px; width: 100%; cursor: pointer; 
             border-radius: 6px; font-size: 1rem; font-weight: 600;
             transition: 0.3s;
         }
         button:hover { background: #218838; }
 
-        .job-list { margin-top: 40px; }
+        .section-box { margin-top: 40px; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
         th, td { 
-            border: 1px solid #eee; padding: 12px; text-align: left; font-size: 0.9rem; 
+            border: 1px solid #eee; padding: 10px; text-align: left; font-size: 0.85rem; vertical-align: top;
         }
         th { background: #003366; color: white; }
         
         .del-btn { 
             color: #ff4d4d; text-decoration: none; font-weight: bold; 
-            padding: 5px 10px; border: 1px solid #ff4d4d; border-radius: 4px;
+            padding: 4px 8px; border: 1px solid #ff4d4d; border-radius: 4px; display: inline-block;
         }
         .del-btn:hover { background: #ff4d4d; color: white; }
         
+        .btn-view {
+            background: #17a2b8; color: white; text-decoration: none; padding: 5px 10px;
+            border-radius: 4px; font-weight: 600; display: inline-block; font-size: 0.8rem;
+        }
+
         .back-link { 
             display: inline-block; margin-top: 20px; color: #003366; 
             text-decoration: none; font-weight: 600; 
         }
 
-        /* Naya Style PDF input ke liye */
         .file-input {
             border: 1px dashed #003366;
             padding: 10px;
             background: #f9f9f9;
             cursor: pointer;
         }
+
+        .review-form {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .btn-update {
+            background: #003366;
+            padding: 6px;
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>🚀 Add New Job Opening</h2>
+        <h2>🚀 Admin Control Panel</h2>
         
+        <!-- Job Posting Section -->
+        <h3>Add New Job Opening</h3>
         <form method="POST" enctype="multipart/form-data">
             <label>Job Title</label>
             <input type="text" name="title" placeholder="e.g. BHEL Executive Trainee" required>
@@ -83,7 +101,8 @@
             <button type="submit">Publish Job Live</button>
         </form>
 
-        <div class="job-list">
+        <!-- Current Active Jobs -->
+        <div class="section-box">
             <h3>Current Active Jobs</h3>
             <table>
                 <thead>
@@ -99,8 +118,65 @@
                         <td>{{ job.title }}</td>
                         <td style="color: #d9534f; font-weight: 600;">{{ job.last_date }}</td>
                         <td>
-                            <a href="{{ url_for('delete_job', id=job.id) }}" class="del-btn" onclick="return confirm('Kya aap sach mein isse delete karna chahte hain?')">Delete</a>
+                            <a href="{{ url_for('delete_job', id=job.id) }}" class="del-btn" onclick="return confirm('Are you sure you want to delete this job?')">Delete</a>
                         </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="3" style="text-align:center;">No jobs active.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Student Research Paper Submissions Section -->
+        <div class="section-box">
+            <h3>🔬 Student Research Paper Submissions</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student Info</th>
+                        <th>Paper Details</th>
+                        <th>Supervisor</th>
+                        <th>PDF Draft</th>
+                        <th>Review & Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for paper in papers %}
+                    <tr>
+                        <td>
+                            <strong>{{ paper.student_name }}</strong><br>
+                            <small>📞 {{ paper.contact_no }}</small><br>
+                            <small style="color: #777;">User: {{ paper.student_username }}</small>
+                        </td>
+                        <td>
+                            <strong>{{ paper.title }}</strong><br>
+                            <small><b>Branch:</b> {{ paper.branch }}</small><br>
+                            <p style="font-size: 0.8rem; color: #555; margin: 5px 0 0 0;">{{ paper.abstract }}</p>
+                        </td>
+                        <td>{{ paper.guide_name or 'N/A' }}</td>
+                        <td>
+                            {% if paper.pdf_filename %}
+                                <a href="{{ url_for('static', filename='uploads/pdfs/' + paper.pdf_filename) }}" target="_blank" class="btn-view">📄 View PDF</a>
+                            {% else %}
+                                <span style="color: #888; font-style: italic;">No PDF Uploaded</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form action="{{ url_for('review_paper', paper_id=paper.id) }}" method="POST" class="review-form">
+                                <select name="status">
+                                    <option value="Under Review" {% if paper.status == 'Under Review' %}selected{% endif %}>Under Review</option>
+                                    <option value="Approved" {% if paper.status == 'Approved' %}selected{% endif %}>Approved</option>
+                                    <option value="Revision Needed" {% if paper.status == 'Revision Needed' %}selected{% endif %}>Revision Needed</option>
+                                </select>
+                                <textarea name="feedback" rows="2" placeholder="Guide feedback...">{{ paper.feedback or '' }}</textarea>
+                                <button type="submit" class="btn-update">Update Status</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #777;">No research papers submitted yet.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
