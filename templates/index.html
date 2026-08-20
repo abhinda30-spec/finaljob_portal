@@ -14,7 +14,8 @@
             --danger: #e74c3c;
             --text-dark: #2c3e50;
             --bg-light: #f8f9fa;
-            --info: #17a2b8; /* PDF button ke liye naya color */
+            --info: #17a2b8;
+            --purple: #6f42c1;
         }
 
         body { 
@@ -57,6 +58,53 @@
         h2.section-title::after {
             content: ''; display: block; width: 50px; height: 4px;
             background: var(--accent); margin: 10px auto; border-radius: 2px;
+        }
+
+        /* Research Section Banner Styling */
+        .research-banner {
+            background: linear-gradient(135deg, #1e3c72, var(--purple));
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 50px;
+            box-shadow: 0 8px 20px rgba(111, 66, 193, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .research-banner-text h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.6rem;
+            color: var(--accent);
+        }
+
+        .research-banner-text p {
+            margin: 0;
+            font-size: 0.95rem;
+            opacity: 0.9;
+            max-width: 550px;
+            line-height: 1.5;
+        }
+
+        .btn-research {
+            background: var(--accent);
+            color: var(--primary);
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 700;
+            transition: 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            white-space: nowrap;
+        }
+
+        .btn-research:hover {
+            background: #fff;
+            color: var(--purple);
+            transform: translateY(-2px);
         }
 
         .job-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
@@ -104,7 +152,6 @@
 
         .btn:hover { background: var(--secondary); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
 
-        /* PDF Button Style */
         .btn-pdf {
             background: white; color: var(--info); border: 2px solid var(--info);
             padding: 10px 20px; text-decoration: none; border-radius: 8px;
@@ -168,10 +215,20 @@
         {% endif %}
     </div>
     <h1> B.Tech <span style="color: var(--accent); "> Sarkari Pariksha</span> 🎓</h1>
-    <p>Premium Career Portal for Engineers</p>
+    <p>Premium Career & Project Portal for Engineers</p>
 </header>
 
 <div class="container">
+
+    <!-- Research Paper Section Banner -->
+    <div class="research-banner">
+        <div class="research-banner-text">
+            <h3>🔬 Galgotias University Research Portal</h3>
+            <p>Designed for 4th-year final students to upload research paper drafts, receive advisor feedback, and follow IEEE publishing guidelines.</p>
+        </div>
+        <a href="{{ url_for('research') }}" class="btn-research">Prepare Research Paper &rarr;</a>
+    </div>
+
     <h2 class="section-title">Latest Job Opportunities</h2>
     
     <div class="job-grid">
@@ -199,12 +256,12 @@
 
     <div class="dev-card">
         <img src="{{ url_for('static', filename='My Profile.png') }}" class="dev-avatar" alt="Abhishek">
-        <h3 style="margin: 0; color: var(--primary); font-size: 1.5rem;">Abhishek Kumar-Software Engineer</h3>
+        <h3 style="margin: 0; color: var(--primary); font-size: 1.5rem;">Abhishek Kumar - Software Engineer</h3>
         <p style="margin: 5px 0; color: var(--success); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">
             Lead Developer & Visionary
         </p>
         <p style="max-width: 500px; margin: 15px auto; color: #555; line-height: 1.6; font-style: italic;">
-            "Maine ye platform isliye banaya hai taaki har Engineering student ko sahi samay par sarkari naukri ki update mil sake."
+            "Maine ye platform isliye banaya hai taaki har Engineering student ko sahi samay par sarkari naukri ki update aur research paper prep guidelines mil sake."
         </p>
         <div style="margin-top: 20px;">
             <a href="/contact" style="text-decoration: none; color: var(--primary); font-weight: 600; border: 2px solid var(--primary); padding: 8px 25px; border-radius: 25px; transition: 0.3s; display: inline-block;">
@@ -217,6 +274,7 @@
 <footer>
     <div class="footer-links">
         <a href="/">Home</a> 
+        <a href="{{ url_for('research') }}">Research Portal</a>
         <a href="/contact">Contact Us</a> 
         <a href="#">Privacy Policy</a> 
         <a href="#">Terms</a>
@@ -225,9 +283,9 @@
         <strong>Disclaimer:</strong> BTech Sarkari Pariksha is an independent educational portal. We are not affiliated with any government organization.
     </div>
     <p style="font-size: 0.9rem; color: #fff; margin-top: 20px;">
-        Designed & Developed by <b>Abhishek kumar </b>
+        Designed & Developed by <b>Abhishek Kumar</b>
     </p>
-    <p style="font-size: 0.7rem; color: #555;">&copy; 2026 Abhishek Kumar </p>
+    <p style="font-size: 0.7rem; color: #555;">&copy; 2026 Abhishek Kumar</p>
     
     <a href="/admin" class="admin-secret-link">Admin Access</a>
 </footer>

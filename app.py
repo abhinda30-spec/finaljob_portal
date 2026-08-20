@@ -23,7 +23,6 @@ else:
 
 # --- Memory & Optimization Fixes ---
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# Isse Neon database ke connections memory nahi bharenge
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     "pool_pre_ping": True,
     "pool_recycle": 300,
@@ -51,6 +50,18 @@ class Job(db.Model):
     last_date = db.Column(db.String(50), nullable=True)
     pdf_filename = db.Column(db.String(200), nullable=True)
 
+# NEW MODEL: Research Papers for 4th Year Students
+class ResearchPaper(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    student_username = db.Column(db.String(50), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    branch = db.Column(db.String(100), nullable=False)
+    guide_name = db.Column(db.String(100), nullable=True)
+    abstract = db.Column(db.Text, nullable=True)
+    status = db.Column(db.String(50), default="Under Review")  # Under Review, Approved, Revision Needed
+    feedback = db.Column(db.Text, nullable=True)
+    pdf_filename = db.Column(db.String(200), nullable=True)
+
 # --- Email Configuration (SSL Mode for Render) ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
@@ -76,9 +87,8 @@ def home():
     user = session.get('username')
     try:
         all_jobs = Job.query.all()
-    except:
+    except Exception:
         all_jobs = []
-    # Home page par Loading Spinner ya message dikhana yaad rakhein jaisa aapne plan kiya tha
     return render_template('index.html', jobs=all_jobs, user=user)
 
 @app.route('/apply/<int:job_id>')
@@ -111,6 +121,43 @@ def contact():
             print(f"MAIL ERROR: {e}")
             return f"<h3>Email Error: {str(e)}</h3>"
     return render_template('contact.html', user=user)
+
+# NEW ROUTE: Student Research Paper Dashboard & Upload
+@app.route('/research', methods=['GET', 'POST'])
+def research():
+    if 'username' not in session:
+        flash("Kindly login first to access the Research Paper portal!", "danger")
+        return redirect(url_for('login'))
+    
+    user = session.get('username')
+    
+    if request.method == 'POST':
+        title = request.form.get('title')
+        branch = request.form.get('branch')
+        guide_name = request.form.get('guide_name')
+        abstract = request.form.get('abstract')
+        
+        pdf_file = request.files.get('pdf_file')
+        filename = None
+        if pdf_file and pdf_file.filename != '':
+            filename = f"research_{user}_{secure_filename(pdf_file.filename)}"
+            pdf_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        
+        new_paper = ResearchPaper(
+            student_username=user,
+            title=title,
+            branch=branch,
+            guide_name=guide_name,
+            abstract=abstract,
+            pdf_filename=filename
+        )
+        db.session.add(new_paper)
+        db.session.commit()
+        flash("Research paper draft submitted successfully!", "success")
+        return redirect(url_for('research'))
+
+    user_papers = ResearchPaper.query.filter_by(student_username=user).all()
+    return render_template('research.html', papers=user_papers, user=user)
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
@@ -155,7 +202,23 @@ def admin():
         return redirect(url_for('admin'))
     
     all_jobs = Job.query.all()
-    return render_template('admin.html', jobs=all_jobs)
+    all_papers = ResearchPaper.query.all()
+    return render_template('admin.html', jobs=all_jobs, papers=all_papers)
+
+# NEW ROUTE: Admin/Faculty updates research paper review status & feedback
+@app.route('/review-paper/<int:paper_id>', methods=['POST'])
+def review_paper(paper_id):
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('admin'))
+    
+    paper = db.session.get(ResearchPaper, paper_id)
+    if paper:
+        paper.status = request.form.get('status')
+        paper.feedback = request.form.get('feedback')
+        db.session.commit()
+        flash("Research paper review updated successfully!", "success")
+    
+    return redirect(url_for('admin'))
 
 @app.route('/delete-job/<int:id>')
 def delete_job(id):
@@ -167,7 +230,7 @@ def delete_job(id):
         if job_to_delete.pdf_filename:
             try:
                 os.remove(os.path.join(app.config['UPLOAD_FOLDER'], job_to_delete.pdf_filename))
-            except:
+            except Exception:
                 pass
         db.session.delete(job_to_delete)
         db.session.commit()
@@ -212,6 +275,5 @@ def logout():
     return redirect(url_for('home'))
 
 if __name__ == '__main__':
-    # Render default port fix
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)

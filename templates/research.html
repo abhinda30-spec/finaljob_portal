@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Research Paper Preparation - Galgotias University</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" href="/">BTech Portal</a>
+    <div>
+        <a href="/" class="btn btn-outline-light btn-sm me-2">Home</a>
+        <a href="/logout" class="btn btn-danger btn-sm">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container my-5">
+    <div class="p-4 bg-white rounded shadow-sm mb-4">
+        <h2>Galgotias University - Final Year Research Portal</h2>
+        <p class="text-muted">Submit your 4th-year research paper drafts, monitor review statuses, and track advisor feedback.</p>
+    </div>
+
+    <!-- Paper Upload Form -->
+    <div class="card mb-5">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Submit Research Paper Draft</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Paper Title</label>
+                        <input type="text" name="title" class="form-control" required placeholder="e.g., IoT Based Smart Farming">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Branch / Specialization</label>
+                        <input type="text" name="branch" class="form-control" required placeholder="e.g., CSE - AI & ML">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Faculty Guide / Supervisor Name</label>
+                        <input type="text" name="supervisor" class="form-control" placeholder="e.g., Prof. Rajesh Sharma">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Upload Research Draft (PDF)</label>
+                        <input type="file" name="pdf_file" class="form-control" accept=".pdf" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Abstract / Summary</label>
+                    <textarea name="abstract" class="form-control" rows="3" placeholder="Brief explanation of your project research..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-success">Submit Draft</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Submissions Overview -->
+    <h4>My Submitted Papers</h4>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered bg-white">
+            <thead class="table-dark">
+                <tr>
+                    <th>Title</th>
+                    <th>Branch</th>
+                    <th>Supervisor</th>
+                    <th>Status</th>
+                    <th>Guide Feedback</th>
+                    <th>Download PDF</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for paper in papers %}
+                <tr>
+                    <td>{{ paper.title }}</td>
+                    <td>{{ paper.branch }}</td>
+                    <td>{{ paper.supervisor or 'N/A' }}</td>
+                    <td>
+                        <span class="badge {% if paper.status == 'Approved' %}bg-success{% elif paper.status == 'Needs Revision' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                            {{ paper.status }}
+                        </span>
+                    </td>
+                    <td>{{ paper.feedback or 'Pending Review' }}</td>
+                    <td>
+                        {% if paper.pdf_filename %}
+                        <a href="{{ url_for('static', filename='uploads/pdfs/' + paper.pdf_filename) }}" target="_blank" class="btn btn-sm btn-outline-primary">View File</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">No research papers uploaded yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
