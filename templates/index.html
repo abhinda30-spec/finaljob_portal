@@ -61,44 +61,10 @@
             background: var(--accent); margin: 10px auto; border-radius: 2px;
         }
 
-        /* Guidance Card Styling */
-        .guidance-card {
-            background: linear-gradient(135deg, #002244, #00509d);
-            color: white; padding: 30px; border-radius: 15px;
-            margin-bottom: 40px; box-shadow: 0 8px 25px rgba(0, 51, 102, 0.25);
-            border: 2px solid var(--accent);
-        }
-
-        .guidance-form-box {
-            background: #ffffff; color: #333; padding: 25px;
-            border-radius: 12px; margin-top: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .guidance-form-box input, 
-        .guidance-form-box textarea {
-            width: 100%; padding: 12px; margin-bottom: 12px;
-            border: 1px solid #ccc; border-radius: 6px;
-            font-family: inherit; box-sizing: border-box;
-        }
-
-        /* Compact QR Section */
-        .qr-section {
-            text-align: center; background: #f8f9fa;
-            padding: 12px; border-radius: 8px;
-            border: 1px dashed var(--secondary); margin: 10px 0;
-        }
-
-        .qr-section img {
-            width: 100px; height: 100px;
-            border-radius: 6px; border: 2px solid #fff;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-
         /* Feature Banners Styling */
         .feature-banner {
             color: white; padding: 30px; border-radius: 15px;
-            margin-bottom: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            margin-bottom: 40px; box-shadow: 0 8px 20px rgba(0,0,0,0.12);
             display: flex; align-items: center; justify-content: space-between;
             flex-wrap: wrap; gap: 20px;
         }
@@ -194,7 +160,7 @@
 
 <header>
     <div class="user-nav">
-        <a href="#guidance-section">1-on-1 Guidance</a> | 
+        <a href="{{ url_for('research') }}">Research Portal</a> | 
         {% if user %}
             <span>Welcome <b>{{ user }}</b>!</span>
             <a href="/logout" class="logout-btn">Logout</a>
@@ -207,69 +173,6 @@
 </header>
 
 <div class="container">
-
-    <!-- Step 1 & Step 2 Guidance Form Section -->
-    <div class="guidance-card" id="guidance-section">
-        <h3 style="margin: 0 0 10px 0; font-size: 1.8rem; color: var(--accent);">
-            🎓 1st Year Guidance Session (Galgotias University)
-        </h3>
-        <p style="margin: 0; line-height: 1.6; opacity: 0.95;">
-            Get personal 1-on-1 mentorship for course roadmap, branch selection, subject prep, and exam strategies (30 min consultation).
-        </p>
-
-        <div class="guidance-form-box">
-            <form id="guidanceForm" action="{{ url_for('guidance') }}" method="POST">
-                
-                <!-- STEP 1: Registration Details -->
-                <div id="step1">
-                    <h4 style="margin-top: 0; color: var(--primary); text-align: center; font-size: 1.2rem;">
-                        Step 1: Student Details
-                    </h4>
-                    <input type="text" id="full_name" name="full_name" placeholder="Full Name (e.g., Rahul Sharma)" required>
-                    <input type="text" id="contact_no" name="contact_no" placeholder="WhatsApp / Phone Number" required>
-                    <textarea id="query_text" name="query_text" placeholder="Describe your topic, question, or guidance required..." rows="3" required></textarea>
-
-                    <button type="button" onclick="goToStep2()" class="btn" style="width: 100%; background: var(--primary); border: none; font-size: 1rem; cursor: pointer;">
-                        Proceed to Payment (₹100) &rarr;
-                    </button>
-                </div>
-
-                <!-- STEP 2: Compact Payment QR (Hidden by default) -->
-                <div id="step2" style="display: none;">
-                    <h4 style="margin-top: 0; color: var(--primary); text-align: center; font-size: 1.2rem;">
-                        Step 2: Complete Payment
-                    </h4>
-                    
-                    <div class="qr-section">
-                        <p style="margin: 0 0 8px 0; font-weight: 600; color: var(--primary); font-size: 0.9rem;">
-                            Scan QR Code to pay ₹100 via UPI
-                        </p>
-                        <img src="{{ url_for('static', filename='qr.jpeg') }}" alt="Payment QR Code">
-                        <p style="margin: 5px 0 0 0; font-size: 0.75rem; color: #555;">
-                            Paytm, PhonePe, GPay, BHIM
-                        </p>
-                    </div>
-
-                    <div style="display: flex; align-items: center; gap: 8px; margin: 15px 0;">
-                        <input type="checkbox" name="payment_done" value="1" id="payCheck" required style="width: auto; margin: 0;">
-                        <label for="payCheck" style="font-size: 0.85rem; font-weight: 600;">
-                            I have completed the ₹100 payment via QR Code
-                        </label>
-                    </div>
-
-                    <div style="display: flex; gap: 10px;">
-                        <button type="button" onclick="goToStep1()" style="width: 30%; background: #6c757d; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer;">
-                            &larr; Back
-                        </button>
-                        <button type="submit" class="btn" style="width: 70%; margin-top: 0; background: var(--success); border: none; font-size: 1rem; cursor: pointer;">
-                            Submit Registration
-                        </button>
-                    </div>
-                </div>
-
-            </form>
-        </div>
-    </div>
 
     <!-- Research Paper Section Banner -->
     <div class="feature-banner research-banner">
@@ -310,7 +213,7 @@
             Lead Developer & Visionary
         </p>
         <p style="max-width: 500px; margin: 15px auto; color: #555; line-height: 1.6; font-style: italic;">
-            "Maine ye platform isliye banaya hai taaki har Engineering student ko sahi samay par sarkari naukri ki update, 1st-year roadmap guidance, aur research paper prep guidelines mil sake."
+            "Maine ye platform isliye banaya hai taaki har Engineering student ko sahi samay par sarkari naukri ki update aur research paper prep guidelines mil sake."
         </p>
         <div style="margin-top: 20px;">
             <a href="/contact" style="text-decoration: none; color: var(--primary); font-weight: 600; border: 2px solid var(--primary); padding: 8px 25px; border-radius: 25px; transition: 0.3s; display: inline-block;">
@@ -323,7 +226,6 @@
 <footer>
     <div class="footer-links">
         <a href="/">Home</a> 
-        <a href="#guidance-section">1st-Year Guidance</a>
         <a href="{{ url_for('research') }}">Research Portal</a>
         <a href="/contact">Contact Us</a> 
         <a href="#">Privacy Policy</a> 
@@ -339,27 +241,6 @@
     
     <a href="/admin" class="admin-secret-link">Admin Access</a>
 </footer>
-
-<script>
-    function goToStep2() {
-        const name = document.getElementById('full_name').value.trim();
-        const contact = document.getElementById('contact_no').value.trim();
-        const query = document.getElementById('query_text').value.trim();
-
-        if (!name || !contact || !query) {
-            alert('Kripya saari details fill kariye proceed karne ke liye.');
-            return;
-        }
-
-        document.getElementById('step1').style.display = 'none';
-        document.getElementById('step2').style.display = 'block';
-    }
-
-    function goToStep1() {
-        document.getElementById('step2').style.display = 'none';
-        document.getElementById('step1').style.display = 'block';
-    }
-</script>
 
 </body>
 </html>
