@@ -70,6 +70,20 @@
             padding: 6px;
             font-size: 0.8rem;
         }
+
+        /* Status Badges for Guidance Queries */
+        .badge-paid {
+            background: #28a745; color: white; padding: 4px 8px; 
+            border-radius: 4px; font-size: 0.75rem; font-weight: 600; display: inline-block;
+        }
+        .badge-pending {
+            background: #ffc107; color: #333; padding: 4px 8px; 
+            border-radius: 4px; font-size: 0.75rem; font-weight: 600; display: inline-block;
+        }
+        .wa-link {
+            color: #28a745; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+        }
+        .wa-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -77,31 +91,78 @@
     <div class="container">
         <h2>🚀 Admin Control Panel</h2>
         
-        <!-- Job Posting Section -->
-        <h3>Add New Job Opening</h3>
-        <form method="POST" enctype="multipart/form-data">
-            <label>Job Title</label>
-            <input type="text" name="title" placeholder="e.g. BHEL Executive Trainee" required>
-            
-            <label>Eligible Branches</label>
-            <input type="text" name="branch" placeholder="e.g. ME, EE, Civil" required>
-            
-            <label>Salary Package</label>
-            <input type="text" name="salary" placeholder="e.g. Rs. 70,000/-" required>
-            
-            <label>Apply Link (URL)</label>
-            <input type="text" name="url" placeholder="https://official-link.com" required>
-            
-            <label>Last Date to Apply</label>
-            <input type="text" name="last_date" placeholder="e.g. 25 Feb 2026" required>
+        <!-- 1. GUIDANCE QUERIES SECTION (AT TOP) -->
+        <div class="section-box" style="margin-top: 10px;">
+            <h3>🎓 1-on-1 Guidance Requests</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>WhatsApp Contact</th>
+                        <th>Query / Details</th>
+                        <th>Payment Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in guidance %}
+                    <tr>
+                        <td><strong>{{ req.full_name }}</strong></td>
+                        <td>
+                            <!-- Direct WhatsApp Chat Link -->
+                            <a href="https://wa.me/91{{ req.contact_no }}" target="_blank" class="wa-link">
+                                💬 {{ req.contact_no }}
+                            </a>
+                        </td>
+                        <td>{{ req.query_text }}</td>
+                        <td>
+                            <!-- Status Badges -->
+                            {% if 'Paid' in req.payment_status or 'paid' in req.payment_status %}
+                                <span class="badge-paid">Paid (₹100)</span>
+                            {% else %}
+                                <span class="badge-pending">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('delete_guidance', id=req.id) }}" class="del-btn" onclick="return confirm('Dismiss this guidance request?')">Dismiss</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #777;">No guidance queries submitted yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-            <label>Upload Official Notification (PDF)</label>
-            <input type="file" name="pdf_file" accept=".pdf" class="file-input">
-            
-            <button type="submit">Publish Job Live</button>
-        </form>
+        <!-- 2. JOB POSTING SECTION -->
+        <div class="section-box">
+            <h3>Add New Job Opening</h3>
+            <form method="POST" enctype="multipart/form-data">
+                <label>Job Title</label>
+                <input type="text" name="title" placeholder="e.g. BHEL Executive Trainee" required>
+                
+                <label>Eligible Branches</label>
+                <input type="text" name="branch" placeholder="e.g. ME, EE, Civil" required>
+                
+                <label>Salary Package</label>
+                <input type="text" name="salary" placeholder="e.g. Rs. 70,000/-" required>
+                
+                <label>Apply Link (URL)</label>
+                <input type="text" name="url" placeholder="https://official-link.com" required>
+                
+                <label>Last Date to Apply</label>
+                <input type="text" name="last_date" placeholder="e.g. 25 Feb 2026" required>
 
-        <!-- Current Active Jobs -->
+                <label>Upload Official Notification (PDF)</label>
+                <input type="file" name="pdf_file" accept=".pdf" class="file-input">
+                
+                <button type="submit">Publish Job Live</button>
+            </form>
+        </div>
+
+        <!-- 3. CURRENT ACTIVE JOBS SECTION -->
         <div class="section-box">
             <h3>Current Active Jobs</h3>
             <table>
@@ -128,7 +189,7 @@
             </table>
         </div>
 
-        <!-- Student Research Paper Submissions Section -->
+        <!-- 4. RESEARCH PAPERS REVIEW SECTION -->
         <div class="section-box">
             <h3>🔬 Student Research Paper Submissions</h3>
             <table>

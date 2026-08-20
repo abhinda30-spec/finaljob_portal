@@ -1,11 +1,11 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_mail import Mail, Message
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
-import os
 
 app = Flask(__name__)
-app.secret_key = 'btech_sarkari_final_2026'
+app.secret_key = os.environ.get('SECRET_KEY', 'btech_sarkari_final_2026')
 
 # --- Configuration for Database ---
 DATABASE_URL = os.environ.get('DATABASE_URL')
@@ -50,7 +50,6 @@ class Job(db.Model):
     last_date = db.Column(db.String(50), nullable=True)
     pdf_filename = db.Column(db.String(200), nullable=True)
 
-# UPDATED MODEL: Research Papers for 4th Year Students
 class ResearchPaper(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_username = db.Column(db.String(50), nullable=False)
@@ -60,18 +59,26 @@ class ResearchPaper(db.Model):
     branch = db.Column(db.String(100), nullable=False)
     guide_name = db.Column(db.String(100), nullable=True)
     abstract = db.Column(db.Text, nullable=True)
-    status = db.Column(db.String(50), default="Under Review")  # Under Review, Approved, Revision Needed
+    status = db.Column(db.String(50), default="Under Review")
     feedback = db.Column(db.Text, nullable=True)
-    pdf_filename = db.Column(db.String(200), nullable=True)  # Optional PDF
+    pdf_filename = db.Column(db.String(200), nullable=True)
 
-# --- Email Configuration (SSL Mode for Render) ---
+# Guidance Requests (1-on-1 Guidance)
+class GuidanceQuery(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    full_name = db.Column(db.String(100), nullable=False)
+    contact_no = db.Column(db.String(15), nullable=False)
+    query_text = db.Column(db.Text, nullable=False)
+    payment_status = db.Column(db.String(20), default="Pending")
+
+# --- Email Configuration ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
-app.config['MAIL_USERNAME'] = 'abhinda30@gmail.com'
-app.config['MAIL_PASSWORD'] = 'mvja piwt sbje tjrm' 
-app.config['MAIL_DEFAULT_SENDER'] = 'abhinda30@gmail.com'
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'abhinda30@gmail.com')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = app.config['MAIL_USERNAME']
 mail = Mail(app)
 
 # --- DATABASE INITIALIZATION & AUTOMATIC MIGRATION ---
@@ -79,7 +86,6 @@ with app.app_context():
     try:
         db.create_all()
         
-        # Auto-Migration: Add missing columns if table already exists in PostgreSQL
         if DATABASE_URL:
             with db.engine.connect() as connection:
                 connection.execute(db.text("ALTER TABLE research_paper ADD COLUMN IF NOT EXISTS student_name VARCHAR(100) DEFAULT 'N/A';"))
@@ -100,6 +106,33 @@ def home():
     except Exception:
         all_jobs = []
     return render_template('index.html', jobs=all_jobs, user=user)
+
+# Guidance Portal
+@app.route('/guidance', methods=['GET', 'POST'])
+def guidance():
+    user = session.get('username')
+    show_popup = False
+    
+    if request.method == 'POST':
+        full_name = request.form.get('full_name')
+        contact_no = request.form.get('contact_no')
+        query_text = request.form.get('query_text')
+        payment_done = request.form.get('payment_done')
+
+        status = "Paid (₹100)" if payment_done else "Pending"
+
+        new_guidance = GuidanceQuery(
+            full_name=full_name,
+            contact_no=contact_no,
+            query_text=query_text,
+            payment_status=status
+        )
+        db.session.add(new_guidance)
+        db.session.commit()
+
+        show_popup = True
+
+    return render_template('guidance.html', show_popup=show_popup, user=user)
 
 @app.route('/apply/<int:job_id>')
 def apply(job_id):
@@ -174,9 +207,10 @@ def research():
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
+    admin_pass = os.environ.get('ADMIN_PASSWORD', 'Research!321#papers')
     if not session.get('admin_logged_in'):
         if request.method == 'POST':
-            if request.form.get('admin_password') == 'Research!321#papers':
+            if request.form.get('admin_password') == admin_pass:
                 session['admin_logged_in'] = True
                 return redirect(url_for('admin'))
             else:
@@ -216,7 +250,8 @@ def admin():
     
     all_jobs = Job.query.all()
     all_papers = ResearchPaper.query.all()
-    return render_template('admin.html', jobs=all_jobs, papers=all_papers)
+    all_guidance = GuidanceQuery.query.all()
+    return render_template('admin.html', jobs=all_jobs, papers=all_papers, guidance=all_guidance)
 
 @app.route('/review_paper/<int:paper_id>', methods=['POST'])
 def review_paper(paper_id):
@@ -247,6 +282,20 @@ def delete_job(id):
         db.session.delete(job_to_delete)
         db.session.commit()
         flash("Job deleted successfully!", "success")
+    
+    return redirect(url_for('admin'))
+
+# DELETE GUIDANCE REQUEST ROUTE
+@app.route('/delete-guidance/<int:id>')
+def delete_guidance(id):
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('admin'))
+    
+    guidance_to_delete = db.session.get(GuidanceQuery, id)
+    if guidance_to_delete:
+        db.session.delete(guidance_to_delete)
+        db.session.commit()
+        flash("Guidance request dismissed successfully!", "success")
     
     return redirect(url_for('admin'))
 
