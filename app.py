@@ -74,13 +74,21 @@ app.config['MAIL_PASSWORD'] = 'mvja piwt sbje tjrm'
 app.config['MAIL_DEFAULT_SENDER'] = 'abhinda30@gmail.com'
 mail = Mail(app)
 
-# --- DATABASE INITIALIZATION ---
+# --- DATABASE INITIALIZATION & AUTOMATIC MIGRATION ---
 with app.app_context():
     try:
         db.create_all()
-        print("Database tables created successfully!")
+        
+        # Auto-Migration: Add missing columns if table already exists in PostgreSQL
+        if DATABASE_URL:
+            with db.engine.connect() as connection:
+                connection.execute(db.text("ALTER TABLE research_paper ADD COLUMN IF NOT EXISTS student_name VARCHAR(100) DEFAULT 'N/A';"))
+                connection.execute(db.text("ALTER TABLE research_paper ADD COLUMN IF NOT EXISTS contact_no VARCHAR(15) DEFAULT 'N/A';"))
+                connection.commit()
+                
+        print("Database schema updated successfully!")
     except Exception as e:
-        print(f"Error creating database: {e}")
+        print(f"Error initializing/migrating database: {e}")
 
 # --- Routes ---
 
@@ -142,7 +150,6 @@ def research():
         
         pdf_file = request.files.get('pdf_file')
         filename = None
-        # PDF upload is completely optional now
         if pdf_file and pdf_file.filename != '':
             filename = f"research_{user}_{secure_filename(pdf_file.filename)}"
             pdf_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -169,7 +176,6 @@ def research():
 def admin():
     if not session.get('admin_logged_in'):
         if request.method == 'POST':
-            # Updated password check
             if request.form.get('admin_password') == 'Research!321#papers':
                 session['admin_logged_in'] = True
                 return redirect(url_for('admin'))
