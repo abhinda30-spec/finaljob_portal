@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get 1-on-1 Guidance</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
+        .container { max-width: 500px; margin: 40px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; }
+        label { font-weight: bold; display: block; margin-top: 15px; margin-bottom: 5px; }
+        input[type="text"], textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .payment-box { background: #eef9ff; border: 1px solid #007bff; padding: 15px; border-radius: 6px; margin-top: 15px; }
+        .btn { width: 100%; background: #28a745; color: white; border: none; padding: 12px; margin-top: 20px; font-size: 16px; border-radius: 4px; cursor: pointer; }
+        .btn:hover { background: #218838; }
+        
+        /* Popup Styling */
+        .modal-overlay { display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        .modal-card { background: white; padding: 30px; border-radius: 8px; text-align: center; max-width: 350px; }
+        .modal-card button { background: #007bff; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>1-on-1 Guidance Request</h2>
+    <form method="POST">
+        <label for="full_name">Your Name</label>
+        <input type="text" id="full_name" name="full_name" placeholder="Enter your full name" required>
+
+        <label for="contact_no">Contact Number</label>
+        <input type="text" id="contact_no" name="contact_no" placeholder="Enter phone/WhatsApp number" required>
+
+        <label for="query_text">What do you want to know?</label>
+        <textarea id="query_text" name="query_text" rows="4" placeholder="Describe your doubt or query..." required></textarea>
+
+        <div class="payment-box">
+            <p style="margin:0; font-weight:bold;">Guidance Fee: ₹100 for 30 Mins</p>
+            <p style="margin: 5px 0 10px 0; font-size: 14px; color: #555;">Pay via UPI to <strong>8210332801@paytm</strong></p>
+            <label style="font-weight:normal; font-size: 14px;">
+                <input type="checkbox" name="payment_done" value="true"> I have completed the ₹100 payment
+            </label>
+        </div>
+
+        <button type="submit" class="btn">Submit Guidance Request</button>
+    </form>
+</div>
+
+{% if show_popup %}
+<div class="modal-overlay" id="popup">
+    <div class="modal-card">
+        <h3 style="color: #28a745; margin-top:0;">Request Submitted!</h3>
+        <p>We will connect with you soon.</p>
+        <button onclick="document.getElementById('popup').style.display='none'">OK</button>
+    </div>
+</div>
+{% endif %}
+
+</body>
+</html>
